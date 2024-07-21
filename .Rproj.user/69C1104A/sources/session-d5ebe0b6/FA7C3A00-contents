@@ -1,0 +1,50 @@
+
+library(pacman)
+
+pacman::p_load(dplyr, car, lmtest, psych, scatterplot3d)
+
+dados <- read.csv('tabela.csv')
+View(dados)
+glimpse(dados)
+
+
+## definição do modelo observando Valor Unitario
+mod <- lm(Valor.Unitário ~ Área.total + Desempenho.Agropecuário + Aptidão + Proximidade.com.a.rodovia, dados)
+
+
+##Define a grid dos graficos
+par(mfrow=c(2,2))
+plot(mod)
+
+#par(mfrow=c(1,1))
+
+## Normalidade dos residuos
+
+## distribuição dos dos dados = normal -> p-value > 0,05 (5%)
+## distribuição dos dos dados != normal -> p-value <= 0,05 (5%)
+shapiro.test(mod$residuals)
+
+# neste caso a distribuição é normal
+
+## Outlier dos residuos por meio da função summary, que checa os maiores e menores valores
+## Vamos checar por meio do residuo padronizado
+summary(rstandard(mod))
+
+# como a mediana esta proxima de 0, não aparenta ter nenhum outlier
+
+## Homocedasticidade
+
+bptest(mod)
+
+## multicolinearidade, relação entre as variaveis independentes: r > 0.9 (ou 0.8)
+
+pairs.panels(dados)
+
+# como nenhuma variavel independente não teve uma correlação acima de 0.8, podemos concluir que não há multicolinearidade
+
+# outro metodo de checar a multicolinearidade é com o vif, que se algum dos resultados 
+# estiver acima de 10 indica a presença de um problema
+vif(mod)
+
+
+
